@@ -1,9 +1,10 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import random
 import uuid
+import time
 
 app = FastAPI()
 
@@ -21,9 +22,9 @@ class Product(BaseModel):
     price: float
     image_url: str
     retailer: str
-    badge: str | None = None
+    badge: Optional[str] = None
 
-# Mock product database
+# Mock product database (keep your existing products)
 MOCK_PRODUCTS = [
     Product(
         id="1",
@@ -50,9 +51,8 @@ MOCK_PRODUCTS = [
 
 @app.post("/search")
 async def search(file: UploadFile = File(...)):
-    # In mock mode, ignore image and return random products with badges
+    # Mock mode: return random products with badges
     results = random.sample(MOCK_PRODUCTS, 2)
-    # Assign badges dynamically
     results[0].badge = "Best Overall"
     results[1].badge = "Best Value"
     return results
@@ -60,6 +60,26 @@ async def search(file: UploadFile = File(...)):
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+# ----- New Mock Checkout Endpoint -----
+class CheckoutRequest(BaseModel):
+    product_id: str
+    price: float
+    retailer: str
+
+class CheckoutResponse(BaseModel):
+    mandate: str          # mock mandate token
+    expires_at: int        # Unix timestamp
+
+@app.post("/create-mandate", response_model=CheckoutResponse)
+async def create_mandate(request: CheckoutRequest):
+    """
+    Mock Google UCP mandate generation.
+    Returns a unique mandate ID and an expiry time (10 minutes from now).
+    """
+    mandate_id = f"mandate_{uuid.uuid4().hex[:8]}"
+    expires_at = int(time.time()) + 600   # 10 minutes
+    return CheckoutResponse(mandate=mandate_id, expires_at=expires_at)
 
 if __name__ == "__main__":
     import uvicorn

@@ -101,3 +101,36 @@
     @apply font-display font-bold tracking-tight;
   }
 }
+@media (max-width: 768px) {
+  [role="dialog"] {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+  [role="dialog"] > div.flex {
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    flex-direction: column !important;
+  }
+  @keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-float-delayed {
+  animation: float 5s ease-in-out infinite 1s;
+}
+}

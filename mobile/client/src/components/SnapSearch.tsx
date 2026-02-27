@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 
-export function SnapSearch() {
+function SnapSearch() {
   const [isScanning, setIsScanning] = useState(false);
   const [hasScanned, setHasScanned] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
@@ -53,15 +53,24 @@ export function SnapSearch() {
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-3xl blur-2xl opacity-50 animate-pulse" />
+      {/* Animated silver glow background */}
+      <div className="absolute -inset-4 bg-gradient-to-r from-[#e0e0e0]/40 via-[#f0f0f0]/40 to-[#ffffff]/40 rounded-3xl blur-3xl opacity-70 animate-pulse" />
       
-      <Card className="relative overflow-hidden border-white/10 bg-black/40 backdrop-blur-xl p-6 md:p-8 rounded-3xl shadow-2xl">
+      <Card className="relative overflow-hidden border border-white/20 bg-black/30 backdrop-blur-xl p-6 md:p-8 rounded-3xl shadow-2xl shadow-white/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#e0e0e0]/10 via-transparent to-[#ffffff]/10 pointer-events-none" />
+        
         <Tabs defaultValue="snap" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/5 mb-6">
-            <TabsTrigger value="snap" className="data-[state=active]:bg-primary data-[state=active]:text-black">
+          <TabsList className="grid w-full grid-cols-2 bg-black/50 border border-white/10 p-1 rounded-2xl mb-6">
+            <TabsTrigger 
+              value="snap" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#e0e0e0] data-[state=active]:to-[#ffffff] data-[state=active]:text-black font-bold transition-all duration-300 rounded-xl"
+            >
               <Camera className="w-4 h-4 mr-2" /> Snap
             </TabsTrigger>
-            <TabsTrigger value="text" className="data-[state=active]:bg-primary data-[state=active]:text-black">
+            <TabsTrigger 
+              value="text" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#e0e0e0] data-[state=active]:to-[#ffffff] data-[state=active]:text-black font-bold transition-all duration-300 rounded-xl"
+            >
               <MessageSquareText className="w-4 h-4 mr-2" /> Text
             </TabsTrigger>
           </TabsList>
@@ -77,16 +86,25 @@ export function SnapSearch() {
                     exit={{ opacity: 0, scale: 0.9 }}
                     className="w-full space-y-6"
                   >
-                    <div className="relative mx-auto w-32 h-32 flex items-center justify-center rounded-full border-2 border-dashed border-white/20 bg-white/5 group hover:border-primary/50 transition-colors cursor-pointer" onClick={handleUpload}>
-                      <div className="absolute inset-0 rounded-full border border-white/10 animate-[spin_10s_linear_infinite]" />
-                      <Camera className="w-12 h-12 text-white/70 group-hover:text-primary transition-colors" />
-                      <div className="absolute bottom-2 right-2 bg-primary text-black rounded-full p-1.5 shadow-lg shadow-primary/20">
+                    {/* Upload area with silver gradient ring */}
+                    <div 
+                      className="relative mx-auto w-32 h-32 flex items-center justify-center rounded-full border-2 border-dashed border-white/30 bg-white/5 group hover:border-[#ffffff]/70 transition-all duration-300 cursor-pointer"
+                      onClick={handleUpload}
+                    >
+                      {/* Rotating silver gradient ring */}
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-[#e0e0e0] via-[#f0f0f0] to-[#ffffff] opacity-0 group-hover:opacity-50 blur-md animate-spin-slow" />
+                      <div className="absolute inset-0 rounded-full border border-white/10 animate-[spin_8s_linear_infinite]" />
+                      {/* Camera icon with silver glow */}
+                      <Camera className="w-12 h-12 text-[#C4C4C4]/70 group-hover:text-[#ffffff] transition-colors z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.7)]" />
+                      <div className="absolute bottom-2 right-2 bg-gradient-to-r from-[#e0e0e0] to-[#ffffff] text-black rounded-full p-1.5 shadow-lg shadow-white/50">
                         <Upload className="w-4 h-4" />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <h3 className="text-2xl font-display font-bold text-white">Snap & Find</h3>
+                      <h3 className="text-3xl font-display font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                        Snap & Find
+                      </h3>
                       <p className="text-muted-foreground text-sm">
                         Upload a photo or take a picture to instantly find products online.
                       </p>
@@ -94,7 +112,7 @@ export function SnapSearch() {
 
                     <Button 
                       size="lg" 
-                      className="w-full bg-primary text-black hover:bg-primary/90 hover:scale-[1.02] transition-all font-bold h-12 rounded-xl"
+                      className="w-full bg-gradient-to-r from-[#e0e0e0] to-[#ffffff] text-black hover:from-[#d0d0d0] hover:to-[#f0f0f0] hover:scale-[1.02] transition-all font-bold h-12 rounded-xl shadow-lg shadow-white/30"
                       onClick={handleUpload}
                     >
                       Start Visual Search <ArrowRight className="ml-2 w-4 h-4" />
@@ -107,18 +125,19 @@ export function SnapSearch() {
                     animate={{ opacity: 1, y: 0 }}
                     className="w-full relative"
                   >
-                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 border border-white/10 group">
-                      <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                    <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-6 border-2 border-transparent bg-gradient-to-r from-[#e0e0e0] via-[#f0f0f0] to-[#ffffff] p-[2px]">
+                      <div className="absolute inset-0 bg-black rounded-2xl" />
+                      <img src={preview} alt="Preview" className="absolute inset-[2px] w-[calc(100%-4px)] h-[calc(100%-4px)] object-cover rounded-2xl" />
                       
                       {isScanning && (
-                        <div className="absolute inset-0 bg-primary/10 z-10">
+                        <div className="absolute inset-0 bg-white/10 z-10 backdrop-blur-[1px]">
                           <motion.div 
-                            className="absolute left-0 right-0 h-1 bg-primary shadow-[0_0_20px_rgba(34,197,94,0.8)]"
+                            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-[#e0e0e0] via-[#f0f0f0] to-[#ffffff] shadow-[0_0_20px_rgba(255,255,255,0.8)]"
                             animate={{ top: ['0%', '100%', '0%'] }}
                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                           />
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <ScanLine className="w-16 h-16 text-primary animate-pulse" />
+                            <ScanLine className="w-16 h-16 text-[#C4C4C4]/80 animate-pulse" />
                           </div>
                         </div>
                       )}
@@ -135,7 +154,7 @@ export function SnapSearch() {
 
                     <div className="space-y-4">
                       {isScanning ? (
-                        <div className="flex items-center justify-center gap-3 text-primary">
+                        <div className="flex items-center justify-center gap-3 text-[#C4C4C4]">
                           <Loader2 className="w-5 h-5 animate-spin" />
                           <span className="font-medium animate-pulse">Analyzing image patterns...</span>
                         </div>
@@ -143,7 +162,7 @@ export function SnapSearch() {
                         <Button 
                           onClick={() => setPreview(null)}
                           variant="outline" 
-                          className="w-full border-white/10 hover:bg-white/5 text-white"
+                          className="w-full border-white/10 hover:bg-white/5 text-[#C4C4C4] bg-black/20 backdrop-blur-sm rounded-xl"
                         >
                           Scan Another
                         </Button>
@@ -162,7 +181,9 @@ export function SnapSearch() {
               className="space-y-6"
             >
               <div className="space-y-2">
-                <h3 className="text-2xl font-display font-bold text-white">Text to Shop</h3>
+                <h3 className="text-3xl font-display font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                  Text to Shop
+                </h3>
                 <p className="text-muted-foreground text-sm">
                   Describe what you're looking for in your own words.
                 </p>
@@ -170,14 +191,14 @@ export function SnapSearch() {
 
               <Textarea 
                 placeholder="E.g. 'Blue suede sneakers with white soles, size 10'..." 
-                className="bg-white/5 border-white/10 text-white min-h-[120px] rounded-xl focus-visible:ring-primary"
+                className="bg-white/5 border-white/10 text-[#C4C4C4] min-h-[120px] rounded-xl focus-visible:ring-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black backdrop-blur-sm"
                 value={textQuery}
                 onChange={(e) => setTextQuery(e.target.value)}
               />
 
               <Button 
                 size="lg" 
-                className="w-full bg-primary text-black hover:bg-primary/90 hover:scale-[1.02] transition-all font-bold h-12 rounded-xl"
+                className="w-full bg-gradient-to-r from-[#e0e0e0] to-[#ffffff] text-black hover:from-[#d0d0d0] hover:to-[#f0f0f0] hover:scale-[1.02] transition-all font-bold h-12 rounded-xl shadow-lg shadow-white/30"
                 onClick={handleTextSubmit}
                 disabled={isScanning || !textQuery.trim()}
               >
@@ -193,8 +214,13 @@ export function SnapSearch() {
       </Card>
       
       <div className="absolute -top-12 -left-12 p-4 bg-black/50 backdrop-blur border border-white/10 rounded-2xl -rotate-12 animate-float hidden md:block">
-        <Sparkles className="w-6 h-6 text-secondary" />
+        <Sparkles className="w-6 h-6 text-[#C4C4C4]" />
+      </div>
+      <div className="absolute -bottom-8 -right-8 p-3 bg-black/50 backdrop-blur border border-white/10 rounded-full animate-float-delayed hidden md:block">
+        <div className="w-2 h-2 rounded-full bg-white animate-ping" />
       </div>
     </div>
   );
 }
+
+export default SnapSearch;

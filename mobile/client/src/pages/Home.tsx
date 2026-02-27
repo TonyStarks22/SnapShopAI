@@ -1,9 +1,11 @@
+import React, { lazy, Suspense } from 'react';
 import { Navigation } from "@/components/Navigation";
 import { Hero } from "@/components/Hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Star, Info, Truck, ShieldCheck, UserCheck, ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import snapshopDemo from '../assets/snapshop_app_demo1.png';
 import {
   Dialog,
   DialogContent,
@@ -13,13 +15,17 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 
+// Lazy load below‑the‑fold components
+const RecentPurchases = lazy(() => import('../components/RecentPurchases'));
+const GlobalSnaps = lazy(() => import('../components/GlobalSnaps').then(module => ({ default: module.GlobalSnaps })));
+
 // Mock Data for Results with weighting factors
 const MOCK_PRODUCTS = [
   { 
     id: 1, 
     name: "Urban Tech Runner", 
     price: 145.00, 
-    shipping: 0, 
+    shipping: 0,    
     reviews: 4.8, 
     reliability: 0.98,
     vendor: "Amazon",
@@ -64,16 +70,23 @@ export default function Home() {
   const highestRanked = sortedProducts[0];
 
   return (
-    <div className="bg-background min-h-screen text-foreground selection:bg-primary selection:text-black">
+    <div className="relative min-h-screen text-foreground selection:bg-primary selection:text-black overflow-x-hidden">
+      {/* Dark base background */}
+      <div className="absolute inset-0 bg-background -z-10" />
+      
       <Navigation />
       
-      <main>
-        <Hero />
-        
+      <main className="relative z-10">
+        {/* Hero section with its own radial glow */}
+        <section className="relative">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#e0e0e0]/15 via-transparent to-transparent pointer-events-none" />
+          <Hero />
+        </section>
+
         {/* Hidden Trigger for Highest Ranked Detail */}
         <Dialog>
           <DialogTrigger id="highest-rank-detail-trigger" className="hidden" />
-          <DialogContent className="bg-card border-white/10 text-white max-w-3xl rounded-[2.5rem] p-0 overflow-hidden shadow-2xl shadow-primary/20">
+          <DialogContent className="bg-card border-white/10 text-[#C4C4C4] max-w-3xl rounded-[2.5rem] p-0 overflow-hidden shadow-2xl shadow-primary/20">
             <div className="flex flex-col md:flex-row h-full">
               <div className="md:w-1/2 aspect-square md:aspect-auto">
                 <img src={highestRanked.image} alt={highestRanked.name} className="w-full h-full object-cover" />
@@ -84,7 +97,7 @@ export default function Home() {
                     <Badge className="bg-primary text-black font-black uppercase tracking-tighter px-3">SnapShop AI Top Choice</Badge>
                     <Badge variant="outline" className="text-primary border-primary/50 font-mono">Rank {calculateScore(highestRanked)}</Badge>
                   </div>
-                  <DialogTitle className="text-4xl font-display font-bold text-white leading-none mb-2">{highestRanked.name}</DialogTitle>
+                  <DialogTitle className="text-4xl font-display font-bold text-[#C4C4C4] leading-none mb-2">{highestRanked.name}</DialogTitle>
                   <p className="text-muted-foreground text-sm flex items-center gap-2">
                     <UserCheck className="w-4 h-4 text-primary" /> Verified Vendor: {highestRanked.vendor}
                   </p>
@@ -109,7 +122,7 @@ export default function Home() {
                     <ShieldCheck className="w-8 h-8 text-primary opacity-50" />
                   </div>
                   <div className="bg-primary/10 p-4 rounded-2xl border border-primary/30 flex items-center justify-between">
-                    <p className="text-sm font-bold text-white flex items-center gap-3">
+                    <p className="text-sm font-bold text-[#C4C4C4] flex items-center gap-3">
                       <Truck className="w-5 h-5 text-primary" /> 
                       {highestRanked.shipping === 0 ? "Complimentary Express Shipping" : `Shipping: $${highestRanked.shipping}`}
                     </p>
@@ -125,14 +138,28 @@ export default function Home() {
         </Dialog>
 
         {/* Feature Section */}
-        <section className="py-24 bg-white/2 border-y border-white/5">
+        <section className="relative py-24 bg-white/2 border-y border-white/5">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ffffff]/10 via-transparent to-transparent pointer-events-none" />
           <div className="container mx-auto px-4 text-center max-w-4xl">
             <h2 className="text-3xl md:text-5xl font-display font-bold text-white mb-8">
-              Why search with words when you have <span className="text-secondary">eyes?</span>
+              Snap any item. Instantly find it across thousands of <span className="text-secondary">stores.</span>
             </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-12">
+            <p
+              className="text-xl leading-relaxed mb-12 font-medium bg-gradient-to-r from-blue-400 via-cyan-300 to-green-400 bg-clip-text text-transparent"
+              style={{
+                textShadow: '0 0 20px rgba(0,255,200,0.7), 0 0 40px rgba(0,100,255,0.5)',
+              }}
+            >
               Our advanced computer vision technology breaks down thousands of visual data points to find the exact match for color, texture, shape, and style.
             </p>
+            <picture>
+              <source srcSet="/snapshop_demo.webp" type="image/webp" />
+              <img
+                src={snapshopDemo}
+                alt="SnapShop app interface demonstration"
+                className="w-full max-w-3xl mx-auto rounded-2xl shadow-lg my-8"
+              />
+            </picture>
             <div className="grid md:grid-cols-3 gap-8">
               {[
                 { title: "Instant", desc: "Results in under 2 seconds" },
@@ -148,7 +175,18 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="py-12 border-t border-white/10 bg-black">
+        {/* Lazy loaded sections */}
+        <section className="relative">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-[#e0e0e0]/10 via-transparent to-transparent pointer-events-none" />
+          <Suspense fallback={<div className="h-64 text-center text-[#C4C4C4]">Loading community...</div>}>
+            <RecentPurchases />
+            <GlobalSnaps />
+          </Suspense>
+        </section>
+
+        {/* Footer with subtle glow */}
+        <footer className="relative py-12 border-t border-white/10 bg-black">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-[#ffffff]/5 via-transparent to-transparent pointer-events-none" />
           <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="text-2xl font-display font-bold">
               Snap<span className="text-primary">Shop</span>
@@ -158,7 +196,6 @@ export default function Home() {
             </p>
           </div>
         </footer>
-
       </main>
     </div>
   );

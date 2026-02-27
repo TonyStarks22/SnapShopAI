@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant
+    restart: always
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    networks:
+      - snapshop_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    restart: always
+    volumes:
+      - ./es_data:/usr/share/elasticsearch/data
+    networks:
+      - snapshop_network
+
+  fastapi-app:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+      - elasticsearch
+    environment:
+      - QDRANT_HOST=qdrant
+      - ELASTICSEARCH_HOST=elasticsearch
+    networks:
+      - snapshop_network
+
+networks:
+  snapshop_network:
+    driver: bridge

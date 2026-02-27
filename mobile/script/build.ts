@@ -1,6 +1,7 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
 import { rm, readFile } from "fs/promises";
+import { chdir } from "process";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -33,10 +34,16 @@ const allowlist = [
 ];
 
 async function buildAll() {
+  // Set NODE_ENV to production for client build (ensures Tailwind purging)
+  process.env.NODE_ENV = 'production';
+
   await rm("dist", { recursive: true, force: true });
 
   console.log("building client...");
-  await viteBuild();
+  // Change to client directory so Vite finds the correct config and paths
+  chdir('client');
+  await viteBuild(); // uses config from client directory
+  chdir('..'); // go back to root
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
