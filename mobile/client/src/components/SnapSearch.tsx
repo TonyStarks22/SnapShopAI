@@ -7,11 +7,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 
-function SnapSearch() {
+interface SnapSearchProps {
+  onSearchComplete: (results: any[]) => void;
+}
+
+function SnapSearch({ onSearchComplete }: SnapSearchProps) {
   const [isScanning, setIsScanning] = useState(false);
-  const [hasScanned, setHasScanned] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [textQuery, setTextQuery] = useState("");
+
+  const performSearch = async (file: File, query?: string) => {
+    setIsScanning(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    if (query) formData.append('query', query);
+
+    try {
+      const response = await fetch('/search', {
+        method: 'POST',
+        body: formData,
+      });
+      const results = await response.json();
+      onSearchComplete(results);
+      toast({ title: "Search complete!", description: `Found ${results.length} products.` });
+      // Auto-open highest ranking product details
+      const detailTrigger = document.getElementById('highest-rank-detail-trigger');
+      detailTrigger?.click();
+    } catch (error) {
+      toast({ title: "Error", description: "Search failed.", variant: "destructive" });
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   const handleUpload = () => {
     const input = document.createElement('input');
@@ -22,33 +49,17 @@ function SnapSearch() {
       if (file) {
         const url = URL.createObjectURL(file);
         setPreview(url);
-        simulateScan("Visual search successful!");
+        performSearch(file, textQuery);
       }
     };
     input.click();
   };
 
-  const simulateScan = (message: string) => {
-    setIsScanning(true);
-    setHasScanned(false);
-    
-    setTimeout(() => {
-      setIsScanning(false);
-      setHasScanned(true);
-      toast({
-        title: "Success!",
-        description: message,
-      });
-      
-      // Auto-open highest ranking product details
-      const detailTrigger = document.getElementById('highest-rank-detail-trigger');
-      detailTrigger?.click();
-    }, 2500);
-  };
-
   const handleTextSubmit = () => {
     if (!textQuery.trim()) return;
-    simulateScan(`We found items matching: "${textQuery}"`);
+    // For text-only search, create a dummy file (backend may ignore it)
+    const dummyFile = new File(["dummy"], "dummy.jpg", { type: "image/jpeg" });
+    performSearch(dummyFile, textQuery);
   };
 
   return (
