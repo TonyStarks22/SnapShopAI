@@ -17,6 +17,7 @@ function SnapSearch({ onSearchComplete }: SnapSearchProps) {
   const [textQuery, setTextQuery] = useState("");
 
   const performSearch = async (file: File, query?: string) => {
+    console.log('🚀 performSearch called with file:', file.name, file.size);
     setIsScanning(true);
     const formData = new FormData();
     formData.append('file', file);
@@ -28,12 +29,14 @@ function SnapSearch({ onSearchComplete }: SnapSearchProps) {
         body: formData,
       });
       const results = await response.json();
+      console.log('✅ Search results:', results);
       onSearchComplete(results);
       toast({ title: "Search complete!", description: `Found ${results.length} products.` });
       // Auto-open highest ranking product details
       const detailTrigger = document.getElementById('highest-rank-detail-trigger');
       detailTrigger?.click();
     } catch (error) {
+      console.error('❌ Search error:', error);
       toast({ title: "Error", description: "Search failed.", variant: "destructive" });
     } finally {
       setIsScanning(false);
@@ -47,9 +50,12 @@ function SnapSearch({ onSearchComplete }: SnapSearchProps) {
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
+        console.log('✅ File selected:', file.name, file.size);
         const url = URL.createObjectURL(file);
         setPreview(url);
         performSearch(file, textQuery);
+      } else {
+        console.log('⚠️ No file selected');
       }
     };
     input.click();
